@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
 )
 
 /*
@@ -28,7 +32,7 @@ import (
 func maxNumber(nums1, nums2 []int, k int) []int {
 	// 从一个数组中取 k 个数，保持相对顺序，并且结果最大
 	maxSubArray := func(nums []int, k int) []int {
-		stack := []int{}
+		var stack []int
 		drop := len(nums) - k
 		for _, num := range nums {
 			for drop > 0 && len(stack) > 0 && num > stack[len(stack)-1] {
@@ -45,7 +49,7 @@ func maxNumber(nums1, nums2 []int, k int) []int {
 
 	// 合并两个数组成最大值
 	merge := func(nums1, nums2 []int) []int {
-		res := []int{}
+		var res []int
 		for len(nums1) > 0 || len(nums2) > 0 {
 			if greater(nums1, nums2) {
 				res = append(res, nums1[0])
@@ -59,7 +63,7 @@ func maxNumber(nums1, nums2 []int, k int) []int {
 	}
 
 	// 主函数逻辑，枚举可能的分配方式
-	res := []int{}
+	var res []int
 	for i := 0; i <= k && i <= len(nums1); i++ {
 		if k-i <= len(nums2) {
 			sub1 := maxSubArray(nums1, i)
@@ -93,45 +97,35 @@ func max(nums1, nums2 []int) []int {
 
 // 主函数，处理输入和输出
 func main() {
-	// 输入读取
-	var nums1Str, nums2Str string
-	var k int
-	fmt.Scan(&nums1Str)
-	fmt.Scan(&nums2Str)
-	fmt.Scan(&k)
+	reader := bufio.NewReader(os.Stdin)
 
-	// 解析输入数组
 	var nums1, nums2 []int
-	for _, num := range split(nums1Str) {
+
+	line, _ := reader.ReadString('\n')
+	line = strings.TrimRight(line, "\n")
+	strArray := strings.Split(line, ",")
+	for _, s := range strArray {
+		num, _ := strconv.Atoi(s)
 		nums1 = append(nums1, num)
 	}
-	for _, num := range split(nums2Str) {
+
+	line, _ = reader.ReadString('\n')
+	line = strings.TrimRight(line, "\n")
+	strArray = strings.Split(line, ",")
+	for _, s := range strArray {
+		num, _ := strconv.Atoi(s)
 		nums2 = append(nums2, num)
 	}
 
+	line, _ = reader.ReadString('\n')
+	line = strings.TrimRight(line, "\n")
+	k, _ := strconv.Atoi(line)
+
 	// 计算结果并输出
 	result := maxNumber(nums1, nums2, k)
-	for i, num := range result {
-		if i > 0 {
-			fmt.Print(",")
-		}
-		fmt.Print(num)
+	strResArray := make([]string, len(result))
+	for i, r := range result {
+		strResArray[i] = strconv.Itoa(r)
 	}
-	fmt.Println()
-}
-
-// 工具函数：将字符串解析为整数数组
-func split(s string) []int {
-	var res []int
-	var num int
-	for _, c := range s {
-		if c >= '0' && c <= '9' {
-			num = num*10 + int(c-'0')
-		} else if c == ',' {
-			res = append(res, num)
-			num = 0
-		}
-	}
-	res = append(res, num)
-	return res
+	fmt.Println(strings.Join(strResArray, ","))
 }

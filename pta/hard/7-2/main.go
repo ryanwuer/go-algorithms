@@ -27,6 +27,7 @@ import (
 输出最大连通组件的大小
 */
 
+// 查找节点的根节点
 func find(parent []int, x int) int {
 	if parent[x] != x {
 		parent[x] = find(parent, parent[x])
@@ -34,6 +35,7 @@ func find(parent []int, x int) int {
 	return parent[x]
 }
 
+// 合并两个节点
 func union(parent []int, x, y int) {
 	rootX, rootY := find(parent, x), find(parent, y)
 	if rootX != rootY {
@@ -43,14 +45,17 @@ func union(parent []int, x, y int) {
 
 func largestComponentSize(nums []int) int {
 	maxNum := 0
+	// 更新最大数
 	for _, num := range nums {
 		if num > maxNum {
 			maxNum = num
 		}
 	}
 
+	// 初始化 parent 数组，注意 size 等于 maxNum+1
 	parent := make([]int, maxNum+1)
 	for i := range parent {
+		// 初始化 parent 数组，每个元素的 parent 都是自己
 		parent[i] = i
 	}
 
@@ -63,6 +68,7 @@ func largestComponentSize(nums []int) int {
 		}
 	}
 
+	// 计算每个连通分量的大小
 	count := make(map[int]int)
 	res := 0
 	for _, num := range nums {

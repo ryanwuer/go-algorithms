@@ -44,9 +44,7 @@ func main() {
 			}
 		}
 	}
-	sort.Slice(dp, func(i, j int) bool {
-		return dp[i] > dp[j]
-	})
+	sort.Ints(dp)
 
-	fmt.Println(dp[0])
+	fmt.Println(dp[len(dp)-1])
 }
