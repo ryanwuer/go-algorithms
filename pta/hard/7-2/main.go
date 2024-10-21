@@ -1,8 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"math"
+	"os"
+	"strconv"
+	"strings"
 )
 
 /*
@@ -23,61 +27,21 @@ import (
 输出最大连通组件的大小
 */
 
-// 并查集结构体
-type UnionFind struct {
-	parent []int
-	size   []int
-}
-
-// 初始化并查集
-func NewUnionFind(n int) *UnionFind {
-	parent := make([]int, n)
-	size := make([]int, n)
-	for i := 0; i < n; i++ {
-		parent[i] = i
-		size[i] = 1
+func find(parent []int, x int) int {
+	if parent[x] != x {
+		parent[x] = find(parent, parent[x])
 	}
-	return &UnionFind{parent, size}
+	return parent[x]
 }
 
-// 查找操作，找到 x 的根
-func (uf *UnionFind) Find(x int) int {
-	if uf.parent[x] != x {
-		uf.parent[x] = uf.Find(uf.parent[x]) // 路径压缩
-	}
-	return uf.parent[x]
-}
-
-// 合并操作，将 x 和 y 合并
-func (uf *UnionFind) Union(x, y int) {
-	rootX := uf.Find(x)
-	rootY := uf.Find(y)
+func union(parent []int, x, y int) {
+	rootX, rootY := find(parent, x), find(parent, y)
 	if rootX != rootY {
-		// 合并时根据 size 优化
-		if uf.size[rootX] > uf.size[rootY] {
-			uf.parent[rootY] = rootX
-			uf.size[rootX] += uf.size[rootY]
-		} else {
-			uf.parent[rootX] = rootY
-			uf.size[rootY] += uf.size[rootX]
-		}
+		parent[rootY] = rootX
 	}
 }
 
-// 找到最大连通分量的大小
-func (uf *UnionFind) MaxSize() int {
-	maxSize := 0
-	for i := 0; i < len(uf.size); i++ {
-		if uf.size[i] > maxSize {
-			maxSize = uf.size[i]
-		}
-	}
-	return maxSize
-}
-
-// 质因数分解和并查集连接
 func largestComponentSize(nums []int) int {
-	// 找到数组中的最大值
 	maxNum := 0
 	for _, num := range nums {
 		if num > maxNum {
@@ -85,48 +49,46 @@ func largestComponentSize(nums []int) int {
 		}
 	}
 
-	// 初始化并查集
-	uf := NewUnionFind(maxNum + 1)
+	parent := make([]int, maxNum+1)
+	for i := range parent {
+		parent[i] = i
+	}
 
-	// 对每个数进行质因数筛选
 	for _, num := range nums {
 		for factor := 2; factor <= int(math.Sqrt(float64(num))); factor++ {
 			if num%factor == 0 {
-				uf.Union(num, factor)
-				uf.Union(num, num/factor)
+				union(parent, num, factor)
+				union(parent, num, num/factor)
 			}
 		}
 	}
 
-	// 统计每个连通分量的大小
 	count := make(map[int]int)
+	res := 0
 	for _, num := range nums {
-		root := uf.Find(num)
+		root := find(parent, num)
 		count[root]++
-	}
-
-	// 找到最大的连通分量
-	maxSize := 0
-	for _, size := range count {
-		if size > maxSize {
-			maxSize = size
+		if count[root] > res {
+			res = count[root]
 		}
 	}
-
-	return maxSize
+	return res
 }
 
 // 主函数
 func main() {
-	// 从输入读取
-	var nums []int
-	for {
-		var num int
-		n, err := fmt.Scan(&num)
-		if n == 0 || err != nil {
-			break
-		}
-		nums = append(nums, num)
+	reader := bufio.NewReader(os.Stdin)
+	input, _ := reader.ReadString('\n')
+
+	// 去掉换行符
+	input = strings.TrimRight(input, "\n")
+
+	// 将输入的字符串转换为整数数组
+	numStrs := strings.Split(input, " ")
+	nums := make([]int, len(numStrs))
+	for i, str := range numStrs {
+		num, _ := strconv.Atoi(str)
+		nums[i] = num
 	}
 
 	// 计算并输出最大连通分量的大小

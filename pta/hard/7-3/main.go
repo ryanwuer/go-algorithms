@@ -25,68 +25,70 @@ import (
 返回一个表示该最大数的长度为 k 的数组，数组元素用逗号隔开。
 */
 
-// 获取数组中挑选长度为 t 的最大子序列
-func maxSubsequence(nums []int, t int) []int {
-	stack := make([]int, 0, t)
-	drop := len(nums) - t
-
-	for _, num := range nums {
-		// 贪心算法，丢弃较小的元素
-		for len(stack) > 0 && drop > 0 && stack[len(stack)-1] < num {
-			stack = stack[:len(stack)-1]
-			drop--
+func maxNumber(nums1, nums2 []int, k int) []int {
+	// 从一个数组中取 k 个数，保持相对顺序，并且结果最大
+	maxSubArray := func(nums []int, k int) []int {
+		stack := []int{}
+		drop := len(nums) - k
+		for _, num := range nums {
+			for drop > 0 && len(stack) > 0 && num > stack[len(stack)-1] {
+				// 当前数大于栈顶元素，则弹出，并且 drop 减去一
+				stack = stack[:len(stack)-1]
+				drop--
+			}
+			// num 压入栈
+			stack = append(stack, num)
 		}
-		stack = append(stack, num)
+		// 返回前 k 个元素
+		return stack[:k]
 	}
 
-	return stack[:t] // 保留前 t 个元素
-}
-
-// 合并两个数组，构建最大数
-func merge(nums1, nums2 []int) []int {
-	merged := make([]int, 0, len(nums1)+len(nums2))
-	i, j := 0, 0
-	for i < len(nums1) || j < len(nums2) {
-		if compare(nums1, i, nums2, j) {
-			merged = append(merged, nums1[i])
-			i++
-		} else {
-			merged = append(merged, nums2[j])
-			j++
-		}
-	}
-	return merged
-}
-
-// 比较两个数组的字典序大小
-func compare(nums1 []int, i int, nums2 []int, j int) bool {
-	for i < len(nums1) && j < len(nums2) {
-		if nums1[i] != nums2[j] {
-			return nums1[i] > nums2[j]
-		}
-		i++
-		j++
-	}
-	return len(nums1)-i > len(nums2)-j
-}
-
-// 主函数，计算最终最大数
-func maxNumber(nums1 []int, nums2 []int, k int) []int {
-	maxResult := make([]int, k)
-
-	// 尝试在 nums1 中取 i 个元素，nums2 中取 k-i 个元素
-	for i := 0; i <= k && i <= len(nums1); i++ {
-		if k-i <= len(nums2) {
-			subseq1 := maxSubsequence(nums1, i)
-			subseq2 := maxSubsequence(nums2, k-i)
-			merged := merge(subseq1, subseq2)
-			if compare(merged, 0, maxResult, 0) {
-				copy(maxResult, merged)
+	// 合并两个数组成最大值
+	merge := func(nums1, nums2 []int) []int {
+		res := []int{}
+		for len(nums1) > 0 || len(nums2) > 0 {
+			if greater(nums1, nums2) {
+				res = append(res, nums1[0])
+				nums1 = nums1[1:]
+			} else {
+				res = append(res, nums2[0])
+				nums2 = nums2[1:]
 			}
 		}
+		return res
 	}
 
-	return maxResult
+	// 主函数逻辑，枚举可能的分配方式
+	res := []int{}
+	for i := 0; i <= k && i <= len(nums1); i++ {
+		if k-i <= len(nums2) {
+			sub1 := maxSubArray(nums1, i)
+			sub2 := maxSubArray(nums2, k-i)
+			res = max(res, merge(sub1, sub2))
+		}
+	}
+	return res
+}
+
+// 比较两个数组字典序大小
+func greater(nums1, nums2 []int) bool {
+	for i := 0; i < len(nums1) && i < len(nums2); i++ {
+		if nums1[i] > nums2[i] {
+			return true
+		}
+		if nums1[i] < nums2[i] {
+			return false
+		}
+	}
+	return len(nums1) > len(nums2)
+}
+
+// 比较两个数组哪个更大
+func max(nums1, nums2 []int) []int {
+	if greater(nums1, nums2) {
+		return nums1
+	}
+	return nums2
 }
 
 // 主函数，处理输入和输出

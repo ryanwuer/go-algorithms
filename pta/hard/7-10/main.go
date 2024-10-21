@@ -10,24 +10,6 @@ import (
 	"strings"
 )
 
-/*
-超级回文数
-
-如果一个正整数自身是回文数，而且它也是一个回文数的平方，那么我们称这个数为超级回文数。
-
-现在，给定两个正整数 L 和 R ，请按照从小到大的顺序打印包含在范围 [L, R] 中的所有超级回文数。
-
-注：R包含的数字不超过20位
-
-回文数定义：将该数各个位置的数字反转排列，得到的数和原数一样，例如676，2332，10201。
-
-输入格式:
-L,R。例如4,1000
-
-输出格式:
-[L, R]范围内的超级回文数，例如[4, 9, 121, 484]
-*/
-
 // 判断一个数是否是回文数
 func isPalindrome(x int) bool {
 	s := strconv.Itoa(x)
@@ -46,40 +28,41 @@ func reverseString(s string) string {
 
 // 生成在范围 maxNum 内的所有可能的回文数
 func generatePalindromes(maxNum int) []int {
-	var palindromes []int
-	// 生成形式为 'abba' 和 'aba' 的回文数
+	var result []int
+
 	for i := 1; i < 100000; i++ {
 		s := strconv.Itoa(i)
-		// 偶数长度回文数
-		rev := reverseString(s)
-		abbapalindrome, _ := strconv.Atoi(s + rev)
-		if abbapalindrome <= maxNum {
-			palindromes = append(palindromes, abbapalindrome)
+		r := reverseString(s)
+		abba, _ := strconv.Atoi(s + r)
+		if abba <= maxNum {
+			result = append(result, abba)
 		}
-		// 奇数长度回文数
-		rev = reverseString(s[:len(s)-1])
-		abapalindrome, _ := strconv.Atoi(s + rev)
-		if abapalindrome <= maxNum {
-			palindromes = append(palindromes, abapalindrome)
+		r = reverseString(s[:len(s)-1])
+		aba, _ := strconv.Atoi(s + r)
+		if aba <= maxNum {
+			result = append(result, aba)
 		}
 	}
-	return palindromes
+
+	return result
 }
 
 // 找到在给定范围内的所有超级回文数
 func superPalindromesInRange(L, R int) []int {
 	var result []int
-	maxSqrt := int(math.Sqrt(float64(R))) + 1
-	palindromes := generatePalindromes(maxSqrt)
 
-	for _, p := range palindromes {
-		pSquared := p * p
-		if pSquared >= L && pSquared <= R && isPalindrome(pSquared) {
-			result = append(result, pSquared)
+	maxNum := int(math.Sqrt(float64(R))) + 1
+	palindromes := generatePalindromes(maxNum)
+	for i := 0; i < len(palindromes); i++ {
+		tmp := palindromes[i] * palindromes[i]
+		flag := isPalindrome(tmp)
+		if tmp >= L && tmp <= R && flag {
+			result = append(result, tmp)
 		}
 	}
 
 	sort.Ints(result)
+
 	return result
 }
 

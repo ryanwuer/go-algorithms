@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -31,37 +30,25 @@ import (
 // maxChunksToSorted calculates the maximum number of chunks that the array can be split into
 // such that sorting each chunk individually results in the entire array being sorted.
 func maxChunksToSorted(arr []int) (ans int) {
-	// cnt is a map to keep track of the count of elements in the original array and the sorted array.
-	cnt := map[int]int{}
+	var st []int // 用来存储块
+	for _, x := range arr {
+		// 如果当前元素比栈顶大，直接入栈
+		if len(st) == 0 || x >= st[len(st)-1] {
+			st = append(st, x)
+		} else {
+			// 当前元素比栈顶小，开始合并块
+			mx := st[len(st)-1] // 记录当前栈顶最大值
+			st = st[:len(st)-1] // 弹出栈顶
 
-	// b is a copy of the original array arr, which is then sorted.
-	b := append([]int{}, arr...)
-	sort.Ints(b)
-
-	// Iterate through the original array.
-	for i, x := range arr {
-		// Increment the count for the current element in the original array.
-		cnt[x]++
-		// If the count becomes zero, remove the element from the map.
-		if cnt[x] == 0 {
-			delete(cnt, x)
-		}
-
-		// Get the corresponding element from the sorted array.
-		y := b[i]
-		// Decrement the count for the current element in the sorted array.
-		cnt[y]--
-		// If the count becomes zero, remove the element from the map.
-		if cnt[y] == 0 {
-			delete(cnt, y)
-		}
-
-		// If the map is empty, it means we can form a chunk.
-		if len(cnt) == 0 {
-			ans++
+			// 把比当前元素 x 大的栈顶元素都弹出
+			for len(st) > 0 && st[len(st)-1] > x {
+				st = st[:len(st)-1]
+			}
+			// 放入当前块的最大值 mx，保持块的正确顺序
+			st = append(st, mx)
 		}
 	}
-	return
+	return len(st) // 栈中元素的数量就是块的数量
 }
 
 func main() {
