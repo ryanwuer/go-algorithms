@@ -93,6 +93,7 @@ func buildTree(nodes []string) *TreeNode {
 		}
 		i++
 
+		// 右边节点
 		if i < len(nodes) && nodes[i] != "null" {
 			val, _ := strconv.Atoi(nodes[i])
 			curr.Right = &TreeNode{Val: val}

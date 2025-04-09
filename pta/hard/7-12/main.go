@@ -44,6 +44,27 @@ func longestValidParentheses(s string) int {
 	return maxLen
 }
 
+func longest(input string) int {
+	st := []int{-1}
+
+	maxLen := 0
+
+	for i, s := range input {
+		if s == '(' {
+			st = append(st, i)
+		} else {
+			st = st[:len(st)-1]
+			if len(st) > 0 {
+				maxLen = max(maxLen, i-st[len(st)-1])
+			} else {
+				st = append(st, i)
+			}
+		}
+	}
+
+	return maxLen
+}
+
 // 返回两个整数的最大值
 func max(a, b int) int {
 	if a > b {

@@ -7,7 +7,6 @@ package main
  * [160] 相交链表
  */
 
-
 // @lcpr-template-start
 
 // @lcpr-template-end
@@ -20,24 +19,31 @@ package main
  * }
  */
 func getIntersectionNode(headA, headB *ListNode) *ListNode {
+	// Initialize two pointers, one for each list
 	pa, pb := headA, headB
-    for pa != pb {
-        if pa != nil {
-            pa = pa.Next
-        } else {
-            pa = headB
-        }
-        if pb != nil {
-            pb = pb.Next
-        } else {
-            pb = headA
-        }
-    }
-    return pa
+
+	// Continue until both pointers meet (either at intersection or nil)
+	for pa != pb {
+		// If pa reaches end of list A, switch to list B
+		if pa != nil {
+			pa = pa.Next
+		} else {
+			pa = headB
+		}
+
+		// If pb reaches end of list B, switch to list A
+		if pb != nil {
+			pb = pb.Next
+		} else {
+			pb = headA
+		}
+	}
+
+	// Return the intersection node (or nil if no intersection)
+	return pa
 }
+
 // @lc code=end
-
-
 
 /*
 // @lcpr case=start
@@ -52,5 +58,4 @@ func getIntersectionNode(headA, headB *ListNode) *ListNode {
 // 0\n[2,6,4]\n[1,5]\n3\n2\n
 // @lcpr case=end
 
- */
-
+*/

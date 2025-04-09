@@ -51,6 +51,26 @@ func maxChunksToSorted(arr []int) (ans int) {
 	return len(st) // 栈中元素的数量就是块的数量
 }
 
+func maxChunksToSorts(arr []int) int {
+	var st []int
+	for _, x := range arr {
+		if len(st) == 0 || x >= st[len(st)-1] {
+			// 放到最后，成为一个新的数组块
+			st = append(st, x)
+		} else {
+			// 取出栈顶元素，记录下来
+			mx := st[len(st)-1]
+			st = st[:len(st)-1]
+			for len(st) > 0 && st[len(st)-1] > x {
+				st = st[:len(st)-1]
+			}
+			st = append(st, mx)
+		}
+	}
+
+	return len(st)
+}
+
 func main() {
 	// 使用 bufio 来读取标准输入
 	reader := bufio.NewReader(os.Stdin)

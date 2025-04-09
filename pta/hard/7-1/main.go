@@ -78,13 +78,15 @@ func main() {
 
 // Traverse a linked list and return a slice of Node pointers
 func traverseList(head string, nodeMap map[string]*Node) []*Node {
-	var list []*Node
+	var res []*Node
+
 	for head != "-1" {
-		node := nodeMap[head]
-		list = append(list, node)
-		head = node.Next
+		n := nodeMap[head]
+		res = append(res, n)
+		head = n.Next
 	}
-	return list
+
+	return res
 }
 
 // Reverse a slice of Node pointers
@@ -96,26 +98,24 @@ func reverseList(list []*Node) {
 
 // Merge two lists according to the rules
 func mergeLists(longList, shortList []*Node) []*Node {
-	var mergedList []*Node
-	shortLen := len(shortList)
 	longLen := len(longList)
+	shortLen := len(shortList)
 
+	var res []*Node
 	i, j := 0, 0
 	for i < longLen {
-		// Add two nodes from the long list
 		if i < longLen {
-			mergedList = append(mergedList, longList[i])
+			res = append(res, longList[i])
 			i++
 		}
 		if i < longLen {
-			mergedList = append(mergedList, longList[i])
+			res = append(res, longList[i])
 			i++
 		}
-		// Add one node from the short list (in reversed order)
 		if j < shortLen {
-			mergedList = append(mergedList, shortList[j])
+			res = append(res, shortList[j])
 			j++
 		}
 	}
-	return mergedList
+	return res
 }
