@@ -19,7 +19,19 @@
  */
 func maxPathSum(root *TreeNode) int {
 	// 动态规划实现
-	
+	maxSum := math.MinInt
+	var dfs func(node *TreeNode) int
+	dfs = func(node *TreeNode) int {
+		if node == nil {
+			return 0
+		}
+		left := max(0, dfs(node.Left))
+		right := max(0, dfs(node.Right))
+		maxSum = max(maxSum, left+right+node.Val)
+		return max(left, right) + node.Val
+	}
+	dfs(root)
+	return maxSum
 }
 
 // @lc code=end

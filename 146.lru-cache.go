@@ -73,6 +73,76 @@ func (this *LRUCache) Put(key int, value int) {
 	}
 }
 
+// Node 是双向链表节点
+type Node struct {
+    key, value int
+    prev, next *Node
+}
+
+type LRUCache2 struct {
+    capacity int
+    cache    map[int]*Node
+    head     *Node // dummy head
+    tail     *Node // dummy tail
+}
+
+func Constructor2(capacity int) LRUCache2 {
+    head := &Node{}
+    tail := &Node{}
+    head.next = tail
+    tail.prev = head
+
+    return LRUCache2{
+        capacity: capacity,
+        cache:    make(map[int]*Node),
+        head:     head,
+        tail:     tail,
+    }
+}
+
+// 移除一个节点
+func (this *LRUCache2) remove(node *Node) {
+    node.prev.next = node.next
+    node.next.prev = node.prev
+}
+
+// 加到链表头
+func (this *LRUCache2) insertToHead(node *Node) {
+    node.next = this.head.next
+    node.prev = this.head
+    this.head.next.prev = node
+    this.head.next = node
+}
+
+func (this *LRUCache2) Get2(key int) int {
+    if node, ok := this.cache[key]; ok {
+        // 移到头部
+        this.remove(node)
+        this.insertToHead(node)
+        return node.value
+    }
+    return -1
+}
+
+func (this *LRUCache2) Put2(key int, value int) {
+    if node, ok := this.cache[key]; ok {
+        // 更新并移动到头部
+        node.value = value
+        this.remove(node)
+        this.insertToHead(node)
+    } else {
+        if len(this.cache) == this.capacity {
+            // 删除尾部最近最少使用节点
+            lru := this.tail.prev
+            this.remove(lru)
+            delete(this.cache, lru.key)
+        }
+        newNode := &Node{key: key, value: value}
+        this.cache[key] = newNode
+        this.insertToHead(newNode)
+    }
+}
+
 /**
  * Your LRUCache object will be instantiated and called as such:
  * obj := Constructor(capacity);

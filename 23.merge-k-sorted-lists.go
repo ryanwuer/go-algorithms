@@ -53,6 +53,58 @@ func mergeTwoLists(l1, l2 *ListNode) *ListNode {
 	return dummy.Next
 }
 
+func mergeKLists2(lists []*ListNode) *ListNode {
+    h := &ListNodeHeap{}
+    heap.Init(h)
+
+    // 初始化时将每个链表的头节点加入堆
+    for _, node := range lists {
+        if node != nil {
+            heap.Push(h, node)
+        }
+    }
+
+    dummy := &ListNode{}
+    tail := dummy
+
+    // 不断从堆中取出最小节点，接入结果链表
+    for h.Len() > 0 {
+        node := heap.Pop(h).(*ListNode)
+        tail.Next = node
+        tail = tail.Next
+        if node.Next != nil {
+            heap.Push(h, node.Next)
+        }
+    }
+
+    return dummy.Next
+}
+
+// 定义一个最小堆
+type ListNodeHeap []*ListNode
+
+func (h ListNodeHeap) Len() int { return len(h) }
+
+func (h ListNodeHeap) Less(i, j int) bool {
+    return h[i].Val < h[j].Val
+}
+
+func (h ListNodeHeap) Swap(i, j int) {
+    h[i], h[j] = h[j], h[i]
+}
+
+func (h *ListNodeHeap) Push(x interface{}) {
+    *h = append(*h, x.(*ListNode))
+}
+
+func (h *ListNodeHeap) Pop() interface{} {
+    old := *h
+    n := len(old)
+    node := old[n-1]
+    *h = old[0 : n-1]
+    return node
+}
+
 // @lc code=end
 
 /*

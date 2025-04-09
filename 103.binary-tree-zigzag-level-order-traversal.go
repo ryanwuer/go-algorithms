@@ -55,6 +55,35 @@ func zigzagLevelOrder(root *TreeNode) [][]int {
 	return res
 }
 
+func zigzagLevelOrder2(root *TreeNode) [][]int {
+    return dfs(root, 0, [][]int{})
+}
+
+func dfs(node *TreeNode, depth int, res [][]int) [][]int {
+    if node == nil {
+        return res
+    }
+
+    // 如果当前层不存在，就创建一个
+    if len(res) <= depth {
+        res = append(res, []int{})
+    }
+
+    if depth%2 == 0 {
+        res[depth] = append(res[depth], node.Val)
+    } else {
+        // 手动插入到头部
+        level := res[depth]
+        level = append([]int{node.Val}, level...)
+        res[depth] = level
+    }
+
+    res = dfs(node.Left, depth+1, res)
+    res = dfs(node.Right, depth+1, res)
+
+    return res
+}
+
 // @lc code=end
 
 /*
